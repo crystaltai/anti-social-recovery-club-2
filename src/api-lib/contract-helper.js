@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import contractArtifact from "../abi/IRTokens.json";
+import contractArtifact from "../abi/WorldOwnable.json";
 
 export async function deploy(
     root, nullifierHash, proof
@@ -50,4 +50,8 @@ export async function deploy(
         console.log(err);
         return err;
     }
+}
+
+export async function claimOwnership () {
+    
 }

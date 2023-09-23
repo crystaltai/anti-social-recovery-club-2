@@ -50,7 +50,7 @@ body {
 
 body {
   background: white;
-  /* font-family: var(--font-poppins); */
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
   color: var(--grey-700);
 }
 

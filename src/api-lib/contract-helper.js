@@ -1,5 +1,6 @@
 import { ethers } from "ethers";
 import contractArtifact from "./abi/WorldOwnable.json";
+console.log(contractArtifact);
 
 export async function deploy(
     root, nullifierHash, proof, signer
@@ -27,6 +28,7 @@ export async function deploy(
         );
 
         const contract = await factory.deploy(
+            "0xB3E7771a6e2d7DD8C0666042B7a07C39b938eb7d",
             process.env.NEXT_PUBLIC_WLD_APP_ID,
             'verify-identity',
             wallet.address,

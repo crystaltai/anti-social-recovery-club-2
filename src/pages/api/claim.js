@@ -17,10 +17,11 @@ const handler = nc({
   .post(async (req, res) => {
     var returnObject = new Object();
     //root, nullifierHash, proof
+    const signer = req.body.signer
     const root = req.body.merkle_root;
     const nullifierHash = req.body.nullifier_hash;
     const proof = req.body.proof;
-    contractAddress = await deploy(root, nullifierHash, proof);
+    contractAddress = await claimOwnership(root, nullifierHash, proof);
     returnObject.contractAddress = contractAddress;
     returnObject.status = 200;
     res.json(returnObject);

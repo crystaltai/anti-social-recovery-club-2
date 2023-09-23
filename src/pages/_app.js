@@ -1,22 +1,13 @@
 import { ThirdwebProvider } from '@thirdweb-dev/react';
 import '@/styles/globals.css';
 
-const activeChain = 'mumbai';
-
 export default function App({ Component, pageProps }) {
   return (
-    <ThirdwebProvider activeChain={activeChain}>
-      <main className={poppins.variable}>
-        <Component {...pageProps} />
-      </main>
+    <ThirdwebProvider
+      activeChain='mumbai'
+      clientId='518a9865e34648b3ae1c16c03b844ebd'
+    >
+      <Component {...pageProps} />
     </ThirdwebProvider>
   );
 }
-
-// Import fonts
-import { Poppins } from 'next/font/google';
-const poppins = Poppins({
-  subsets: ['latin'],
-  weight: ['100', '300', '400', '500', '700', '900'],
-  variable: '--font-poppins',
-});

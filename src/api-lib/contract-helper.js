@@ -1,8 +1,8 @@
 import { ethers } from "ethers";
-import contractArtifact from "../abi/WorldOwnable.json";
+import contractArtifact from "./abi/WorldOwnable.json";
 
 export async function deploy(
-    root, nullifierHash, proof
+    root, nullifierHash, proof, signer
 ) {
     try {
         const networkEthers =
@@ -15,22 +15,17 @@ export async function deploy(
             process.env.INFURA_API_KEY
         );
 
-        const wallet = ethers.Wallet.fromMnemonic(process.env.SEED).connect(
-            provider
-        );
+        // const wallet = ethers.Wallet.fromMnemonic(process.env.SEED).connect(
+        //     provider
+        // );
+
         const factory = new ethers.ContractFactory(
             contractArtifact.abi,
             contractArtifact.bytecode,
-            wallet
+            // wallet
+            signer
         );
 
-        // IWorldID _worldId, 
-        // string memory _appId,
-        // string memory _action,
-        // address signal,
-        // uint256 root,
-        // uint256 nullifierHash,
-        // uint256[8] memory proof
         const contract = await factory.deploy(
             process.env.NEXT_PUBLIC_WLD_APP_ID,
             'verify-identity',
@@ -52,6 +47,9 @@ export async function deploy(
     }
 }
 
-export async function claimOwnership () {
-    
+export async function claimOwnership(signal,
+    root,
+    nullifierHash,
+    proof) {
+
 }

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.19;
 
 library ByteHasher {
     /// @dev Creates a keccak256 hash of a bytestring.

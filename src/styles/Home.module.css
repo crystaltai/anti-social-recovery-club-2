@@ -31,23 +31,85 @@
   gap: 1rem;
 }
 
-.ConnectWallet {
-  max-width: fit-content !important;
-}
-
-.Button {
-  max-width: fit-content;
-  border-radius: 6px;
-  padding: 0.5rem;
-  border: transparent;
-  cursor: pointer;
-  background-color: var(--grey-400);
-}
-
 .card p {
   margin: 0;
   opacity: 0.6;
   font-size: 0.9rem;
   line-height: 1.5;
-  max-width: 30ch;
+}
+
+.ConnectWallet {
+  max-width: fit-content !important;
+  border: 1px solid var(--grey-300);
+}
+
+.Button {
+  border-radius: 10px !important;
+  padding: 0.5rem 1rem !important;
+  border: transparent !important;
+  cursor: pointer !important;
+  background-color: var(--grey-400) !important;
+  font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+  font-size: 0.8rem !important;
+  min-height: revert !important;
+  height: 40px !important;
+}
+
+.ButtonWC {
+  height: 58px;
+  width: 212px;
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  background-color: white;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 0.8rem;
+  min-height: revert;
+  border: 1px solid var(--grey-300);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.Button:hover,
+.ButtonWC:hover {
+  filter: brightness(95%) !important;
+}
+
+.connect {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.checkmark {
+  background-color: var(--light-green);
+  border: 2px solid green;
+  border-radius: 50%;
+  padding: 4px;
+}
+
+.or {
+  align-self: center;
+}
+
+.existingContract {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.input {
+  padding: 0.7rem 0.7rem;
+  outline: none;
+  border: 1px solid var(--grey-400);
+  border-radius: 10px;
+  flex-grow: 1;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
 }

@@ -1,0 +1,84 @@
+:root {
+  --max-width: 1100px;
+  --border-radius: 12px;
+  --font-mono: ui-monospace, Menlo, Monaco, 'Cascadia Mono', 'Segoe UI Mono',
+    'Roboto Mono', 'Oxygen Mono', 'Ubuntu Monospace', 'Source Code Pro',
+    'Fira Mono', 'Droid Sans Mono', 'Courier New', monospace;
+
+  --foreground-rgb: 0, 0, 0;
+
+  /* Widths and Breakpoints */
+  --max-header-width: 1700px;
+  --max-width: 1200px;
+  --breakpoint-xs: 0;
+  --breakpoint-sm: 450;
+  --breakpoint-md: 750;
+  --breakpoint-lg: 900;
+  --breakpoint-xl: 1200;
+
+  /* Colors */
+  --grey-100: #fafafb;
+  --grey-200: #f6f6fa;
+  --grey-300: #eceff4;
+  --grey-400: #d8dee9;
+  --grey-500: #95a5a6;
+  --grey-600: #3b4252;
+  --grey-700: #2e3440;
+  --grey-800: #1a1a24;
+  --ey-yellow: #ffe600;
+  --light-blue: #b3e6f5;
+  --light-yellow: #fbe7c6;
+  --light-green: #b7f7c4;
+  --light-red: #ffb7b6;
+  --teal: #3aafa9;
+  --red: #fc5c65;
+  --bluegrey: #4b6584;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body {
+  background: white;
+  /* font-family: var(--font-poppins); */
+  color: var(--grey-700);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+h1 {
+  font-weight: 700;
+}
+
+h2 {
+  font-weight: 500;
+}
+
+h3 {
+  font-weight: 400;
+}
+
+h4 {
+  font-weight: 400;
+}
+
+h5 {
+  font-weight: 400;
+}
+
+h6 {
+  font-weight: 300;
+}

@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import contractArtifact from "../abi/WorldOwnable.json";
+import contractArtifact from "./abi/WorldOwnable.json";
 
 export async function deploy(
     root, nullifierHash, proof, signer

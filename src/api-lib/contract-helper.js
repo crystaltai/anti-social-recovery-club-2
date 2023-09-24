@@ -71,7 +71,7 @@ export async function deploy(root, nullifierHash, proof, signer) {
 }
 
 
-export async function claimOwnership(contractAddress, signer, walletAddress, root, nullifierHash, proof) {
+export async function claim(contractAddress, signer, walletAddress, root, nullifierHash, proof) {
   try {
     const networkEthers =
       process.env.NEXT_PUBLIC_PROD_DEPLOYMENT === 'TRUE'

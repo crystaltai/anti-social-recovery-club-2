@@ -39,16 +39,6 @@ export async function deploy(root, nullifierHash, proof, signer) {
       signer
     );
 
-    console.log(
-      process.env.NEXT_PUBLIC_IWORLDID_CONTRACT_ADDRESS,
-      process.env.NEXT_PUBLIC_WLD_APP_ID,
-      'verify-identity',
-      accounts[0],
-      unpackedRoot,
-      unpackedNullifier,
-      unpackedProof
-    );
-
     const transaction = await factory.getDeployTransaction(
       process.env.NEXT_PUBLIC_IWORLDID_CONTRACT_ADDRESS,
       process.env.NEXT_PUBLIC_WLD_APP_ID,
@@ -88,16 +78,6 @@ export async function claim(
   nullifierHash,
   proof
 ) {
-  console.log('Inside claim');
-  console.log(
-    contractAddress,
-    signer,
-    walletAddress,
-    root,
-    nullifierHash,
-    proof
-  );
-
   try {
     const networkEthers =
       process.env.NEXT_PUBLIC_PROD_DEPLOYMENT === 'TRUE'

@@ -107,11 +107,6 @@ export default function Home() {
   return (
     <main className={`${styles.main}`}>
       <div className={styles.grid}>
-        <div>{merkleRoot ? merkleRoot : ''}</div>
-        <div>{nullifierHash ? nullifierHash : ''}</div>
-        <div>{proof ? proof : ''}</div>
-      </div>
-      <div className={styles.grid}>
         <div className={styles.section}>
           <h2>SIGN IN</h2>
           <div className={styles.card}>

@@ -10,9 +10,9 @@ import {
 } from '@thirdweb-dev/react';
 import { IDKitWidget } from '@worldcoin/idkit';
 import { Check } from 'react-feather';
+import contractArtifact from '../api-lib/abi/WorldOwnable.json';
 import Image from 'next/image';
 import styles from '@/styles/Home.module.css';
-// import contractArtifact from '../api-lib/abi/WorldOwnable.json';
 
 export default function Home() {
   const walletAddress = useAddress();
@@ -29,10 +29,7 @@ export default function Home() {
   const [contractAddress, setContractAddress] = React.useState(
     '0xf7CcEE3c444e9Fe9071590730007f40137C3dBB1'
   );
-  console.log(contractAddress);
-  const { contract } = useContract(
-    '0xf7CcEE3c444e9Fe9071590730007f40137C3dBB1'
-  );
+  const { contract } = useContract(contractAddress, contractArtifact.abi);
   console.log('contract', contract);
   const { mutateAsync, isLoading, error } = useContractWrite(
     contract,
@@ -70,9 +67,9 @@ export default function Home() {
     setVerified(true);
   }
 
-  let unpackedClaimRoot;
-  let unpackedClaimNullifier;
-  let unpackedClaimProof;
+  // let unpackedClaimRoot;
+  // let unpackedClaimNullifier;
+  // let unpackedClaimProof;
 
   function onClaimSuccess(response) {
     console.log('modal closed - claim verification successfully verified');
@@ -81,25 +78,48 @@ export default function Home() {
     setClaimNullifierHash(response.nullifier_hash);
     setClaimProof(response.proof);
 
-    unpackedClaimRoot = decodeAbiParameters(
-      [{ type: 'uint256' }],
-      claimMerkleRoot
-    )[0];
+    // unpackedClaimRoot = decodeAbiParameters(
+    //   [{ type: 'uint256' }],
+    //   claimMerkleRoot
+    // )[0];
 
-    unpackedClaimNullifier = decodeAbiParameters(
-      [{ type: 'uint256' }],
-      claimNullifierHash
-    )[0];
+    // unpackedClaimNullifier = decodeAbiParameters(
+    //   [{ type: 'uint256' }],
+    //   claimNullifierHash
+    // )[0];
 
-    unpackedClaimProof = decodeAbiParameters(
-      [{ type: 'uint256[8]' }],
-      claimProof
-    )[0];
+    // unpackedClaimProof = decodeAbiParameters(
+    //   [{ type: 'uint256[8]' }],
+    //   claimProof
+    // )[0];
   }
 
   async function deployContract() {
     try {
       const trxn = await deploy(merkleRoot, nullifierHash, proof, signer);
+      window.ethereum
+        .request({
+          method: 'eth_sendTransaction',
+          params: [trxn],
+        })
+        .then(async response => {
+          receiptLookup(response);
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function claimContract() {
+    try {
+      const trxn = await claimOwnership(
+        contractAddress,
+        signer,
+        walletAddress,
+        merkleRoot,
+        nullifierHash,
+        proof
+      );
       window.ethereum
         .request({
           method: 'eth_sendTransaction',
@@ -268,11 +288,7 @@ export default function Home() {
               )}
             </IDKitWidget>
 
-            {/* address signal,
-        uint256 root,
-        uint256 nullifierHash,
-        uint256[8] calldata proof */}
-            <Web3Button
+            {/* <Web3Button
               contractAddress={contractAddress}
               action={async () => {
                 try {
@@ -291,7 +307,10 @@ export default function Home() {
               className={styles.Button}
             >
               Claim Ownership of Contract
-            </Web3Button>
+            </Web3Button> */}
+            <button className={styles.Button} onClick={claimContract}>
+              Claim Ownership of Contract
+            </button>
           </div>
         </div>
       </div>

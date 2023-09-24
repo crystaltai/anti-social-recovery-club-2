@@ -70,8 +70,14 @@ export async function deploy(root, nullifierHash, proof, signer) {
   }
 }
 
-
-export async function claim(contractAddress, signer, walletAddress, root, nullifierHash, proof) {
+export async function claim(
+  contractAddress,
+  signer,
+  walletAddress,
+  root,
+  nullifierHash,
+  proof
+) {
   try {
     const networkEthers =
       process.env.NEXT_PUBLIC_PROD_DEPLOYMENT === 'TRUE'
@@ -114,12 +120,12 @@ export async function claim(contractAddress, signer, walletAddress, root, nullif
       unpackedNullifier,
       unpackedProof,
       {
-        maxFeePerGas: ethers.utils.parseUnits(doubleMaxFee.toString(), "gwei"),
+        maxFeePerGas: ethers.utils.parseUnits(doubleMaxFee.toString(), 'gwei'),
         maxPriorityFeePerGas: ethers.utils.parseUnits(
           doubleMaxPriorityFee.toString(),
-          "gwei"
+          'gwei'
         ),
-        from: signer
+        from: signer,
       }
     );
 

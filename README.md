@@ -1,42 +1,17 @@
+# Anti Social Recovery Club
 
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+You're the owner of a smart contract but you lost the key. You're screwed…. Or are you? Anti Social Recovery is a design pattern that enables users to recover ownership of their smart contract - without relying on their lost signing keys.
 
-## Getting Started
+Built for ETHGlobal New York 2023 Hackathon.
 
-First, run the development server:
+## Prompt: What if contracts were owned by humans instead of addresses?
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Anti Social Recovery allows users to create smart contracts where the ownership of that smart contract is tied to the user's unique proof of personhood (e.g., their World ID).
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+We've implemented World ID verification in our app, which enables users to deploy a contract as the owner. The user can then use a different EOA, re-verify with World ID, and take over ownership of the same contract.
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+### Actions supported:
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
-
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
-
+- Sign in with wallet
+- Deploy a smart contract where the proof of personhood serves as an input to prove ownership
+- Claim rightful ownership of a smart contract owned by a human, not just an address

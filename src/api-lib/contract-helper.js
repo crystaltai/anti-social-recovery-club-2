@@ -78,6 +78,16 @@ export async function claim(
   nullifierHash,
   proof
 ) {
+  console.log('Inside claim');
+  console.log(
+    contractAddress,
+    signer,
+    walletAddress,
+    root,
+    nullifierHash,
+    proof
+  );
+
   try {
     const networkEthers =
       process.env.NEXT_PUBLIC_PROD_DEPLOYMENT === 'TRUE'
@@ -110,11 +120,11 @@ export async function claim(
 
     const contract = new ethers.Contract(
       contractAddress,
-      IRTokensArtifact.abi,
+      contractArtifact.abi,
       signer
     );
 
-    const tx = await contract.claimOwnership(
+    const transaction = await contract.populateTransaction.claimOwnership(
       walletAddress,
       unpackedRoot,
       unpackedNullifier,
@@ -125,45 +135,18 @@ export async function claim(
           doubleMaxPriorityFee.toString(),
           'gwei'
         ),
-        from: signer,
       }
     );
 
-    const receipt = await tx.wait();
+    const trxn = {
+      from: accounts[0],
+      to: contractAddress,
+      data: transaction.data,
+      maxFeePerGas: transaction.maxFeePerGas._hex,
+      maxPriorityFeePerGas: transaction.maxPriorityFeePerGas._hex,
+    };
 
-    return receipt;
-
-    // const factory = new ethers.ContractFactory(
-    //   contractArtifact.abi,
-    //   contractArtifact.bytecode,
-    //   signer
-    // );
-
-    // const transaction = await factory.getDeployTransaction(
-    //   process.env.NEXT_PUBLIC_IWORLDID_CONTRACT_ADDRESS,
-    //   process.env.NEXT_PUBLIC_WLD_APP_ID,
-    //   'verify-identity',
-    //   accounts[0],
-    //   unpackedRoot,
-    //   unpackedNullifier,
-    //   unpackedProof,
-    //   {
-    //     maxFeePerGas: ethers.utils.parseUnits(doubleMaxFee.toString(), 'gwei'),
-    //     maxPriorityFeePerGas: ethers.utils.parseUnits(
-    //       doubleMaxPriorityFee.toString(),
-    //       'gwei'
-    //     ),
-    //   }
-    // );
-
-    // const trxn = {
-    //   from: accounts[0],
-    //   data: transaction.data,
-    //   maxFeePerGas: transaction.maxFeePerGas._hex,
-    //   maxPriorityFeePerGas: transaction.maxPriorityFeePerGas._hex,
-    // };
-
-    // return trxn;
+    return trxn;
   } catch (err) {
     console.log(err);
     return err;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { ethers } from 'ethers';
-import { deploy } from '../api-lib/contract-helper';
+import { deploy, claim } from '../api-lib/contract-helper';
 import {
   ConnectWallet,
   useContract,
@@ -112,20 +112,22 @@ export default function Home() {
 
   async function claimContract() {
     try {
-      const trxn = await claimOwnership(
+      const trxn = await claim(
         contractAddress,
         signer,
         walletAddress,
-        merkleRoot,
-        nullifierHash,
-        proof
+        claimMerkleRoot,
+        claimNullifierHash,
+        claimProof
       );
+
       window.ethereum
         .request({
           method: 'eth_sendTransaction',
           params: [trxn],
         })
         .then(async response => {
+          console.log(`response: ${response}`);
           receiptLookup(response);
         });
     } catch (error) {

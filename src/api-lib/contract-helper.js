@@ -70,9 +70,88 @@ export async function deploy(root, nullifierHash, proof, signer) {
   }
 }
 
-const sleep = ms => {
-  return new Promise(resolve => setTimeout(resolve, ms));
-};
+export async function claim(
+  contractAddress,
+  signer,
+  walletAddress,
+  root,
+  nullifierHash,
+  proof
+) {
+  console.log('Inside claim');
+  console.log(
+    contractAddress,
+    signer,
+    walletAddress,
+    root,
+    nullifierHash,
+    proof
+  );
+
+  try {
+    const networkEthers =
+      process.env.NEXT_PUBLIC_PROD_DEPLOYMENT === 'TRUE'
+        ? 'matic' //polygon mainnet
+        : 'maticmum'; //polygon mumbai
+
+    const provider = new ethers.providers.InfuraProvider(
+      networkEthers,
+      process.env.NEXT_PUBLIC_INFURA_API_KEY
+    );
+
+    const gasEstimate = await getGasEstimates();
+    const doubleMaxFee = gasEstimate.maxFee.toFixed(4) * 2;
+    const doubleMaxPriorityFee = gasEstimate.maxPriorityFee.toFixed(4) * 2;
+
+    const unpackedRoot = decodeAbiParameters([{ type: 'uint256' }], root)[0];
+    const unpackedNullifier = decodeAbiParameters(
+      [{ type: 'uint256' }],
+      nullifierHash
+    )[0];
+
+    const unpackedProof = decodeAbiParameters(
+      [{ type: 'uint256[8]' }],
+      proof
+    )[0];
+
+    const accounts = await window.ethereum.request({
+      method: 'eth_requestAccounts',
+    });
+
+    const contract = new ethers.Contract(
+      contractAddress,
+      contractArtifact.abi,
+      signer
+    );
+
+    const transaction = await contract.populateTransaction.claimOwnership(
+      walletAddress,
+      unpackedRoot,
+      unpackedNullifier,
+      unpackedProof,
+      {
+        maxFeePerGas: ethers.utils.parseUnits(doubleMaxFee.toString(), 'gwei'),
+        maxPriorityFeePerGas: ethers.utils.parseUnits(
+          doubleMaxPriorityFee.toString(),
+          'gwei'
+        ),
+      }
+    );
+
+    const trxn = {
+      from: accounts[0],
+      to: contractAddress,
+      data: transaction.data,
+      maxFeePerGas: transaction.maxFeePerGas._hex,
+      maxPriorityFeePerGas: transaction.maxPriorityFeePerGas._hex,
+    };
+
+    return trxn;
+  } catch (err) {
+    console.log(err);
+    return err;
+  }
+}
 
 const getGasEstimates = async () => {
   console.log('fetching gas estimates');

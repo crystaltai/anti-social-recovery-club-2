@@ -1,7 +1,6 @@
 import { ethers } from 'ethers';
 import contractArtifact from './abi/WorldOwnable.json';
 import { decodeAbiParameters } from 'viem';
-console.log(contractArtifact);
 
 export async function deploy(root, nullifierHash, proof, signer) {
   try {
@@ -41,7 +40,7 @@ export async function deploy(root, nullifierHash, proof, signer) {
     );
 
     const transaction = await factory.getDeployTransaction(
-      '0x719683F13Eeea7D84fCBa5d7d17Bf82e03E3d260',
+      process.env.NEXT_PUBLIC_IWORLDID_CONTRACT_ADDRESS,
       process.env.NEXT_PUBLIC_WLD_APP_ID,
       'verify-identity',
       accounts[0],
@@ -64,26 +63,7 @@ export async function deploy(root, nullifierHash, proof, signer) {
       maxPriorityFeePerGas: transaction.maxPriorityFeePerGas._hex,
     };
 
-    // console.log('Sleeping');
-    // await sleep(300);
-    // console.log('Awake');
-
-    // console.log('Fetching txrecpt');
-    // const txReceipt = await provider.getTransactionReceipt(transactionHash);
-    // if (txReceipt && txReceipt.blockNumber) {
-    //   return txReceipt;
-    // }
-
-    // console.log(txReceipt);
-
     return trxn;
-
-    // worldOwnableContract = contract.address;
-    // const tx = await contract.deployTransaction.wait();
-    // console.log(tx);
-    // const contractResponse = await contract.value();
-    // console.log(contractResponse);
-    // return worldOwnableContract;
   } catch (err) {
     console.log(err);
     return err;

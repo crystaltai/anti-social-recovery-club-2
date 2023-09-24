@@ -68,18 +68,15 @@ export default function Home() {
   async function deployContract() {
     try {
       const trxn = await deploy(merkleRoot, nullifierHash, proof, signer);
-      console.log(trxn);
       window.ethereum
         .request({
           method: 'eth_sendTransaction',
           params: [trxn],
         })
         .then(async response => {
-          console.log(response);
           receiptLookup(response);
         });
     } catch (error) {
-      console.log(111111);
       console.log(error);
     }
   }

@@ -61,6 +61,7 @@ contract WorldOwnable {
             proof
         );
 
+        _owner = msg.sender;
         _nullifierHash = nullifierHash;
     }
 

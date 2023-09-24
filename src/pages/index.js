@@ -1,40 +1,24 @@
 import React from 'react';
 import { ethers } from 'ethers';
 import { deploy, claim } from '../api-lib/contract-helper';
-import {
-  ConnectWallet,
-  useContract,
-  useAddress,
-  Web3Button,
-  useContractWrite,
-} from '@thirdweb-dev/react';
+import { ConnectWallet, useAddress } from '@thirdweb-dev/react';
 import { IDKitWidget } from '@worldcoin/idkit';
 import { Check } from 'react-feather';
-import contractArtifact from '../api-lib/abi/WorldOwnable.json';
 import Image from 'next/image';
 import styles from '@/styles/Home.module.css';
 
 export default function Home() {
   const walletAddress = useAddress();
   const [verified, setVerified] = React.useState(false);
+  // const [claimVerified, setClaimVerified] = React.useState(false);
   const [merkleRoot, setMerkleRoot] = React.useState(null);
   const [nullifierHash, setNullifierHash] = React.useState(null);
   const [proof, setProof] = React.useState(null);
-  // const [claimVerified, setClaimVerified] = React.useState(false);
-  const [claimMerkleRoot, setClaimMerkleRoot] = React.useState(null);
-  const [claimNullifierHash, setClaimNullifierHash] = React.useState(null);
-  const [claimProof, setClaimProof] = React.useState(null);
-  // const [existingContract, setExistingContract] = React.useState('');
-  // const [contractOwner, setContractOwner] = React.useState('');
-  const [contractAddress, setContractAddress] = React.useState(
-    '0xf7CcEE3c444e9Fe9071590730007f40137C3dBB1'
-  );
-  const { contract } = useContract(contractAddress, contractArtifact.abi);
-  console.log('contract', contract);
-  const { mutateAsync, isLoading, error } = useContractWrite(
-    contract,
-    'claimOwnership'
-  );
+  // const [claimMerkleRoot, setClaimMerkleRoot] = React.useState(null);
+  // const [claimNullifierHash, setClaimNullifierHash] = React.useState(null);
+  // const [claimProof, setClaimProof] = React.useState(null);
+  const [existingContract, setExistingContract] = React.useState('');
+  const [contractAddress, setContractAddress] = React.useState(null);
   const [signer, setSigner] = React.useState(null);
 
   React.useEffect(() => {
@@ -67,32 +51,15 @@ export default function Home() {
     setVerified(true);
   }
 
-  // let unpackedClaimRoot;
-  // let unpackedClaimNullifier;
-  // let unpackedClaimProof;
+  // function onClaimSuccess(response) {
+  //   console.log('modal closed - claim verification successfully verified');
 
-  function onClaimSuccess(response) {
-    console.log('modal closed - claim verification successfully verified');
+  //   setClaimMerkleRoot(response.merkle_root);
+  //   setClaimNullifierHash(response.nullifier_hash);
+  //   setClaimProof(response.proof);
 
-    setClaimMerkleRoot(response.merkle_root);
-    setClaimNullifierHash(response.nullifier_hash);
-    setClaimProof(response.proof);
-
-    // unpackedClaimRoot = decodeAbiParameters(
-    //   [{ type: 'uint256' }],
-    //   claimMerkleRoot
-    // )[0];
-
-    // unpackedClaimNullifier = decodeAbiParameters(
-    //   [{ type: 'uint256' }],
-    //   claimNullifierHash
-    // )[0];
-
-    // unpackedClaimProof = decodeAbiParameters(
-    //   [{ type: 'uint256[8]' }],
-    //   claimProof
-    // )[0];
-  }
+  //   setClaimVerified(true);
+  // }
 
   async function deployContract() {
     try {
@@ -111,14 +78,16 @@ export default function Home() {
   }
 
   async function claimContract() {
+    console.log();
+
     try {
       const trxn = await claim(
         contractAddress,
         signer,
         walletAddress,
-        claimMerkleRoot,
-        claimNullifierHash,
-        claimProof
+        merkleRoot,
+        nullifierHash,
+        proof
       );
 
       window.ethereum
@@ -138,14 +107,13 @@ export default function Home() {
   return (
     <main className={`${styles.main}`}>
       <div className={styles.grid}>
-        <div>{walletAddress}</div>
         <div>{merkleRoot ? merkleRoot : ''}</div>
         <div>{nullifierHash ? nullifierHash : ''}</div>
         <div>{proof ? proof : ''}</div>
       </div>
       <div className={styles.grid}>
         <div className={styles.section}>
-          <h2>1. SIGN IN</h2>
+          <h2>SIGN IN</h2>
           <div className={styles.card}>
             <p>User must connect wallet and verify on World ID.</p>
             <div className={styles.connect}>
@@ -193,7 +161,7 @@ export default function Home() {
         </div>
 
         <div className={styles.section}>
-          <h2>2. DEPLOY</h2>
+          <h2>DEPLOY or IMPORT CONTRACT</h2>
           <div className={styles.card}>
             <p>
               Deploy a new contract as the owner <strong>OR</strong> connect to
@@ -203,17 +171,15 @@ export default function Home() {
             <button className={styles.Button} onClick={deployContract}>
               Deploy new contract as owner
             </button>
-            {contractAddress ? (
-              <div>
-                <p>Newly deployed contract: {contractAddress}</p>
-              </div>
-            ) : (
-              ''
-            )}
-            {/* <h3 className={styles.or}>- OR -</h3>
-
+            <h3 className={styles.or}>- OR -</h3>
             <div className={styles.existingContract}>
-              <div className={styles.form}>
+              <form
+                className={styles.form}
+                onSubmit={e => {
+                  e.preventDefault();
+                  setContractAddress(existingContract);
+                }}
+              >
                 <label htmlFor='existing-contract'>
                   <p>Existing Contract:</p>
                 </label>
@@ -226,90 +192,58 @@ export default function Home() {
                   }}
                   className={styles.input}
                 />
-                {existingContract ? (
-                  <Web3Button
-                    contractAddress={existingContract}
-                    action={async () => {
-                      try {
-                        const owner = await contract.owner.get();
-                        setContractOwner(owner);
-                      } catch (error) {
-                        console.log(error);
-                      }
-                    }}
-                    className={styles.Button}
-                  >
-                    Import
-                  </Web3Button>
-                ) : (
-                  ''
-                )}
-              </div>
-             
-              {contractOwner ? (
-                <div>
-                  <p>Imported contract: {existingContract}</p>
-                  <p>Owner of contract: {contractOwner}</p>
-                  {contractOwner === walletAddress ? (
-                    <p>You are the contract owner</p>
-                  ) : (
-                    <p>
-                      You are <strong>not</strong> the contract owner
-                    </p>
-                  )}
+                <button type='submit' className={styles.Button}>
+                  Import
+                </button>
+              </form>
+
+              {contractAddress ? (
+                <div className={styles.targetContract}>
+                  <p>Target contract: {contractAddress}</p>
                 </div>
               ) : (
                 ''
               )}
-            </div> */}
+            </div>
           </div>
         </div>
 
         <div className={styles.section}>
-          <h2>3. CLAIM OWNERSHIP</h2>
+          <h2>CLAIM OWNERSHIP</h2>
           <div className={styles.card}>
-            <IDKitWidget
-              app_id={process.env.NEXT_PUBLIC_WLD_APP_ID} // obtained from the Developer Portal
-              signal={walletAddress}
-              action='verify-identity' // this is your action name from the Developer Portal
-              onSuccess={onClaimSuccess} // callback when the modal is closed
-              handleVerify={handleVerify} // optional callback when the proof is received
-              credential_types={['orb', 'phone']} // optional, defaults to ['orb']
-              enableTelemetry // optional, defaults to false
-            >
-              {({ open }) => (
-                <button className={styles.ButtonWC} onClick={open}>
-                  <Image
-                    src='/worldcoinlogo.png'
-                    alt='logo'
-                    width={25}
-                    height={25}
-                  />
-                  <span>Re-Verify with World ID to claim ownership</span>
-                </button>
+            <p>
+              User must connect wallet and re-verify on World ID to claim
+              ownership.
+            </p>
+            {/* <div className={styles.connect}>
+              <IDKitWidget
+                app_id={process.env.NEXT_PUBLIC_WLD_APP_ID} // obtained from the Developer Portal
+                signal={walletAddress}
+                action='verify-identity' // this is your action name from the Developer Portal
+                onSuccess={onClaimSuccess} // callback when the modal is closed
+                handleVerify={handleVerify} // optional callback when the proof is received
+                credential_types={['orb', 'phone']} // optional, defaults to ['orb']
+                enableTelemetry // optional, defaults to false
+              >
+                {({ open }) => (
+                  <button className={styles.ButtonWC} onClick={open}>
+                    <Image
+                      src='/worldcoinlogo.png'
+                      alt='logo'
+                      width={25}
+                      height={25}
+                    />
+                    <span>Re-Verify with World ID to claim ownership</span>
+                  </button>
+                )}
+              </IDKitWidget>
+              {claimVerified ? (
+                <Check size={30} stroke='green' className={styles.checkmark} />
+              ) : (
+                ''
               )}
-            </IDKitWidget>
+            </div> */}
 
-            {/* <Web3Button
-              contractAddress={contractAddress}
-              action={async () => {
-                try {
-                  mutateAsync({
-                    args: [
-                      walletAddress,
-                      unpackedClaimRoot,
-                      unpackedClaimNullifier,
-                      unpackedClaimProof,
-                    ],
-                  });
-                } catch (error) {
-                  console.log(error);
-                }
-              }}
-              className={styles.Button}
-            >
-              Claim Ownership of Contract
-            </Web3Button> */}
             <button className={styles.Button} onClick={claimContract}>
               Claim Ownership of Contract
             </button>

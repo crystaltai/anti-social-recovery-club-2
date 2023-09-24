@@ -39,6 +39,16 @@ export async function deploy(root, nullifierHash, proof, signer) {
       signer
     );
 
+    console.log(
+      process.env.NEXT_PUBLIC_IWORLDID_CONTRACT_ADDRESS,
+      process.env.NEXT_PUBLIC_WLD_APP_ID,
+      'verify-identity',
+      accounts[0],
+      unpackedRoot,
+      unpackedNullifier,
+      unpackedProof
+    );
+
     const transaction = await factory.getDeployTransaction(
       process.env.NEXT_PUBLIC_IWORLDID_CONTRACT_ADDRESS,
       process.env.NEXT_PUBLIC_WLD_APP_ID,

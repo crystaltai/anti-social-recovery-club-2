@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@thirdweb-dev/react": "^3.14.39",
+    "@thirdweb-dev/react": "^3.15.0",
     "@thirdweb-dev/sdk": "^3.10.61",
     "@worldcoin/idkit": "^0.5.1",
     "eslint": "8.50.0",

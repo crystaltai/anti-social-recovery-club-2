@@ -6,6 +6,7 @@ import {
   useContract,
   useAddress,
   Web3Button,
+  useContractWrite,
 } from '@thirdweb-dev/react';
 import { IDKitWidget } from '@worldcoin/idkit';
 import { Check } from 'react-feather';
@@ -16,19 +17,27 @@ import styles from '@/styles/Home.module.css';
 export default function Home() {
   const walletAddress = useAddress();
   const [verified, setVerified] = React.useState(false);
-  const [merkleRoot, setMerkleRoot] = React.useState(
-    '0x1a04af3dffa970c55274470c23db1b628ac24136967b1f94366aaa57558e813c'
+  const [merkleRoot, setMerkleRoot] = React.useState(null);
+  const [nullifierHash, setNullifierHash] = React.useState(null);
+  const [proof, setProof] = React.useState(null);
+  // const [claimVerified, setClaimVerified] = React.useState(false);
+  const [claimMerkleRoot, setClaimMerkleRoot] = React.useState(null);
+  const [claimNullifierHash, setClaimNullifierHash] = React.useState(null);
+  const [claimProof, setClaimProof] = React.useState(null);
+  // const [existingContract, setExistingContract] = React.useState('');
+  // const [contractOwner, setContractOwner] = React.useState('');
+  const [contractAddress, setContractAddress] = React.useState(
+    '0xf7CcEE3c444e9Fe9071590730007f40137C3dBB1'
   );
-  const [nullifierHash, setNullifierHash] = React.useState(
-    '0x075f73e345a1d405dedd4fe83b6e7733fb3ae3d51d74f8982cd7c899ff90b57f'
+  console.log(contractAddress);
+  const { contract } = useContract(
+    '0xf7CcEE3c444e9Fe9071590730007f40137C3dBB1'
   );
-  const [proof, setProof] = React.useState(
-    '0x17125d91ce6e08678baa563f53dc5521af5e7f4e51c9b2cb4e03bc9ab66c13fb167d3eca0e9e903e4e9ea2bb66d4385fa4405becb1b91f20b270f71c59d5d6632bec043d89b3f1ae50a38f62fa5e759aad798313e752d31f8c7e6de289e14a7705d4ddb1098269193cff70e7fafb3921e4af8172c30cdad0f24b38a8b36b9a2e09ff4c3af77745f7a6691bd824295b84063a88acf5a6aefcc61f68800a791e6f1d2dc4c7bf2163a16f52000e3edac9d20caf4ad66d9ef327dcae9452c24c2ce718e4a808a21c26da896e9b3c62049c7698e19c24702be66288c55f695a459383133dd0e54df5085d85956eecfcfdd166efc40084ece66743687024863f8f95ff'
+  console.log('contract', contract);
+  const { mutateAsync, isLoading, error } = useContractWrite(
+    contract,
+    'claimOwnership'
   );
-  const [existingContract, setExistingContract] = React.useState('');
-  const [contractOwner, setContractOwner] = React.useState('');
-  const [contractAddress, setContractAddress] = React.useState(null);
-  const { contract } = useContract(existingContract);
   const [signer, setSigner] = React.useState(null);
 
   React.useEffect(() => {
@@ -61,9 +70,32 @@ export default function Home() {
     setVerified(true);
   }
 
-  const sleep = ms => {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  };
+  let unpackedClaimRoot;
+  let unpackedClaimNullifier;
+  let unpackedClaimProof;
+
+  function onClaimSuccess(response) {
+    console.log('modal closed - claim verification successfully verified');
+
+    setClaimMerkleRoot(response.merkle_root);
+    setClaimNullifierHash(response.nullifier_hash);
+    setClaimProof(response.proof);
+
+    unpackedClaimRoot = decodeAbiParameters(
+      [{ type: 'uint256' }],
+      claimMerkleRoot
+    )[0];
+
+    unpackedClaimNullifier = decodeAbiParameters(
+      [{ type: 'uint256' }],
+      claimNullifierHash
+    )[0];
+
+    unpackedClaimProof = decodeAbiParameters(
+      [{ type: 'uint256[8]' }],
+      claimProof
+    )[0];
+  }
 
   async function deployContract() {
     try {
@@ -149,7 +181,14 @@ export default function Home() {
             <button className={styles.Button} onClick={deployContract}>
               Deploy new contract as owner
             </button>
-            <h3 className={styles.or}>- OR -</h3>
+            {contractAddress ? (
+              <div>
+                <p>Newly deployed contract: {contractAddress}</p>
+              </div>
+            ) : (
+              ''
+            )}
+            {/* <h3 className={styles.or}>- OR -</h3>
 
             <div className={styles.existingContract}>
               <div className={styles.form}>
@@ -184,13 +223,7 @@ export default function Home() {
                   ''
                 )}
               </div>
-              {contractAddress ? (
-                <div>
-                  <p>Newly deployed contract: {contractAddress}</p>
-                </div>
-              ) : (
-                ''
-              )}
+             
               {contractOwner ? (
                 <div>
                   <p>Imported contract: {existingContract}</p>
@@ -206,15 +239,58 @@ export default function Home() {
               ) : (
                 ''
               )}
-            </div>
+            </div> */}
           </div>
         </div>
 
         <div className={styles.section}>
           <h2>3. CLAIM OWNERSHIP</h2>
           <div className={styles.card}>
-            <Web3Button className={styles.Button}>
-              Transfer ownership to your wallet address
+            <IDKitWidget
+              app_id={process.env.NEXT_PUBLIC_WLD_APP_ID} // obtained from the Developer Portal
+              signal={walletAddress}
+              action='verify-identity' // this is your action name from the Developer Portal
+              onSuccess={onClaimSuccess} // callback when the modal is closed
+              handleVerify={handleVerify} // optional callback when the proof is received
+              credential_types={['orb', 'phone']} // optional, defaults to ['orb']
+              enableTelemetry // optional, defaults to false
+            >
+              {({ open }) => (
+                <button className={styles.ButtonWC} onClick={open}>
+                  <Image
+                    src='/worldcoinlogo.png'
+                    alt='logo'
+                    width={25}
+                    height={25}
+                  />
+                  <span>Re-Verify with World ID to claim ownership</span>
+                </button>
+              )}
+            </IDKitWidget>
+
+            {/* address signal,
+        uint256 root,
+        uint256 nullifierHash,
+        uint256[8] calldata proof */}
+            <Web3Button
+              contractAddress={contractAddress}
+              action={async () => {
+                try {
+                  mutateAsync({
+                    args: [
+                      walletAddress,
+                      unpackedClaimRoot,
+                      unpackedClaimNullifier,
+                      unpackedClaimProof,
+                    ],
+                  });
+                } catch (error) {
+                  console.log(error);
+                }
+              }}
+              className={styles.Button}
+            >
+              Claim Ownership of Contract
             </Web3Button>
           </div>
         </div>

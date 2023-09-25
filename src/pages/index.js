@@ -20,10 +20,18 @@ export default function Home() {
   const [signer, setSigner] = React.useState(null); // grabs signer from connected wallet
 
   React.useEffect(() => {
-    // window is accessible here.
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    setSigner(provider.getSigner());
-  }, []);
+    const initializeWeb3Provider = () => {
+      if (window.ethereum) {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        setSigner(provider.getSigner());
+      } else {
+        // If window.ethereum is still not available, wait and check again
+        setTimeout(initializeWeb3Provider, 1000); // check every 1 second
+      }
+    };
+
+    initializeWeb3Provider();
+  }, []); // this effect runs once
 
   async function receiptLookup(transactionHash) {
     const provider = new ethers.providers.Web3Provider(window.ethereum);

@@ -101,8 +101,15 @@
 
 .targetContract {
   display: flex;
-  align-self: center;
-  margin-top: 1rem;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.3rem;
+}
+
+.transactionLink {
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .form {

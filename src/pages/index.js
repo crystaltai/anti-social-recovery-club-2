@@ -3,23 +3,21 @@ import { ethers } from 'ethers';
 import { deploy, claim } from '../api-lib/contract-helper';
 import { ConnectWallet, useAddress } from '@thirdweb-dev/react';
 import { IDKitWidget } from '@worldcoin/idkit';
-import { Check } from 'react-feather';
+import { Check, ExternalLink } from 'react-feather';
 import Image from 'next/image';
 import styles from '@/styles/Home.module.css';
 
 export default function Home() {
-  const walletAddress = useAddress();
-  const [verified, setVerified] = React.useState(false);
-  // const [claimVerified, setClaimVerified] = React.useState(false);
-  const [merkleRoot, setMerkleRoot] = React.useState(null);
-  const [nullifierHash, setNullifierHash] = React.useState(null);
-  const [proof, setProof] = React.useState(null);
-  // const [claimMerkleRoot, setClaimMerkleRoot] = React.useState(null);
-  // const [claimNullifierHash, setClaimNullifierHash] = React.useState(null);
-  // const [claimProof, setClaimProof] = React.useState(null);
-  const [existingContract, setExistingContract] = React.useState('');
-  const [contractAddress, setContractAddress] = React.useState(null);
-  const [signer, setSigner] = React.useState(null);
+  const walletAddress = useAddress(); // grabs user wallet address
+  const [verified, setVerified] = React.useState(false); // checks if user is verified with World ID
+  const [merkleRoot, setMerkleRoot] = React.useState(null); // grabs World ID merkle root hash
+  const [nullifierHash, setNullifierHash] = React.useState(null); // grabs World ID nullifier hash
+  const [proof, setProof] = React.useState(null); // grabs World ID proof hash
+  const [contractAddress, setContractAddress] = React.useState(null); // displays deployed contract
+  const [existingContract, setExistingContract] = React.useState(''); // displays imported contract for claim
+  const [existingContractInput, setExistingContractInput] = React.useState(''); // handles input field for importing contract
+  const [claimTrxnHash, setClaimTrxnHash] = React.useState(''); // displays claim transaction hash
+  const [signer, setSigner] = React.useState(null); // grabs signer from connected wallet
 
   React.useEffect(() => {
     // window is accessible here.
@@ -51,16 +49,6 @@ export default function Home() {
     setVerified(true);
   }
 
-  // function onClaimSuccess(response) {
-  //   console.log('modal closed - claim verification successfully verified');
-
-  //   setClaimMerkleRoot(response.merkle_root);
-  //   setClaimNullifierHash(response.nullifier_hash);
-  //   setClaimProof(response.proof);
-
-  //   setClaimVerified(true);
-  // }
-
   async function deployContract() {
     try {
       const trxn = await deploy(merkleRoot, nullifierHash, proof, signer);
@@ -78,11 +66,9 @@ export default function Home() {
   }
 
   async function claimContract() {
-    console.log();
-
     try {
       const trxn = await claim(
-        contractAddress,
+        existingContract,
         signer,
         walletAddress,
         merkleRoot,
@@ -97,7 +83,7 @@ export default function Home() {
         })
         .then(async response => {
           console.log(`response: ${response}`);
-          receiptLookup(response);
+          setClaimTrxnHash(response);
         });
     } catch (error) {
       console.log(error);
@@ -156,23 +142,55 @@ export default function Home() {
         </div>
 
         <div className={styles.section}>
-          <h2>DEPLOY or IMPORT CONTRACT</h2>
+          <h2>DEPLOY CONTRACT</h2>
+          <div className={styles.card}>
+            <p>Deploy a new contract as the owner</p>
+
+            <button
+              className={styles.Button}
+              onClick={deployContract}
+              disabled={walletAddress && verified ? false : true}
+            >
+              Deploy
+            </button>
+            {contractAddress ? (
+              <div className={styles.targetContract}>
+                <p>Contract Deployed: {contractAddress}</p>
+                <p>
+                  <a
+                    href={`https://mumbai.polygonscan.com/address/${contractAddress}`}
+                    target='_blank'
+                    className={styles.transactionLink}
+                  >
+                    View Contract
+                    <ExternalLink size={16} />
+                  </a>
+                </p>
+              </div>
+            ) : (
+              ''
+            )}
+          </div>
+        </div>
+
+        <h2 className={styles.or}>
+          <strong>OR</strong>
+        </h2>
+
+        <div className={styles.section}>
+          <h2>CLAIM OWNERSHIP</h2>
           <div className={styles.card}>
             <p>
-              Deploy a new contract as the owner <strong>OR</strong> connect to
-              an existing contract.
+              Specify a contract to claim ownership. <br />
+              User must connect wallet and re-verify on World ID to claim
+              ownership.
             </p>
-
-            <button className={styles.Button} onClick={deployContract}>
-              Deploy new contract as owner
-            </button>
-            <h3 className={styles.or}>- OR -</h3>
             <div className={styles.existingContract}>
               <form
                 className={styles.form}
                 onSubmit={e => {
                   e.preventDefault();
-                  setContractAddress(existingContract);
+                  setExistingContract(existingContractInput);
                 }}
               >
                 <label htmlFor='existing-contract'>
@@ -180,10 +198,10 @@ export default function Home() {
                 </label>
                 <input
                   id='existing-contract'
-                  value={existingContract}
+                  value={existingContractInput}
                   placeholder='0x...'
                   onChange={event => {
-                    setExistingContract(event.target.value);
+                    setExistingContractInput(event.target.value);
                   }}
                   className={styles.input}
                 />
@@ -191,57 +209,45 @@ export default function Home() {
                   Import
                 </button>
               </form>
-
-              {contractAddress ? (
-                <div className={styles.targetContract}>
-                  <p>Target contract: {contractAddress}</p>
-                </div>
-              ) : (
-                ''
-              )}
             </div>
-          </div>
-        </div>
 
-        <div className={styles.section}>
-          <h2>CLAIM OWNERSHIP</h2>
-          <div className={styles.card}>
-            <p>
-              User must connect wallet and re-verify on World ID to claim
-              ownership.
-            </p>
-            {/* <div className={styles.connect}>
-              <IDKitWidget
-                app_id={process.env.NEXT_PUBLIC_WLD_APP_ID} // obtained from the Developer Portal
-                signal={walletAddress}
-                action='verify-identity' // this is your action name from the Developer Portal
-                onSuccess={onClaimSuccess} // callback when the modal is closed
-                handleVerify={handleVerify} // optional callback when the proof is received
-                credential_types={['orb', 'phone']} // optional, defaults to ['orb']
-                enableTelemetry // optional, defaults to false
-              >
-                {({ open }) => (
-                  <button className={styles.ButtonWC} onClick={open}>
-                    <Image
-                      src='/worldcoinlogo.png'
-                      alt='logo'
-                      width={25}
-                      height={25}
-                    />
-                    <span>Re-Verify with World ID to claim ownership</span>
-                  </button>
-                )}
-              </IDKitWidget>
-              {claimVerified ? (
-                <Check size={30} stroke='green' className={styles.checkmark} />
-              ) : (
-                ''
-              )}
-            </div> */}
-
-            <button className={styles.Button} onClick={claimContract}>
-              Claim Ownership of Contract
+            <button
+              className={styles.Button}
+              onClick={claimContract}
+              disabled={
+                walletAddress && verified && existingContract ? false : true
+              }
+            >
+              Claim Ownership
             </button>
+            {existingContract ? (
+              <div className={styles.targetContract}>
+                <p>Imported Contract: {existingContract}</p>
+              </div>
+            ) : (
+              ''
+            )}
+            {/* TODO: change conditional variable AND polygon link */}
+            {claimTrxnHash ? (
+              <div className={styles.targetContract}>
+                <p>
+                  You have successfully claimed ownership of the imported
+                  contract!
+                </p>
+                <p>
+                  <a
+                    href={`https://mumbai.polygonscan.com/tx/${claimTrxnHash}`}
+                    target='_blank'
+                    className={styles.transactionLink}
+                  >
+                    Want proof?
+                    <ExternalLink size={16} />
+                  </a>
+                </p>
+              </div>
+            ) : (
+              ''
+            )}
           </div>
         </div>
       </div>

@@ -94,12 +94,12 @@ contract WorldOwnable {
     }
 
     function claimOwnership(
-        address signal,
         uint256 root,
         uint256 nullifierHash,
         uint256[8] calldata proof
     ) public virtual{
         require(nullifierHash == _nullifierHash, "Invalid proof");
+        address signal = msg.sender;
         worldId.verifyProof(
             root,
             groupId, 

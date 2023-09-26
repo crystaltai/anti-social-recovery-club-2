@@ -78,7 +78,6 @@ export default function Home() {
       const trxn = await claim(
         existingContract,
         signer,
-        walletAddress,
         merkleRoot,
         nullifierHash,
         proof

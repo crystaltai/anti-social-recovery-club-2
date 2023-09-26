@@ -73,7 +73,6 @@ export async function deploy(root, nullifierHash, proof, signer) {
 export async function claim(
   contractAddress,
   signer,
-  walletAddress,
   root,
   nullifierHash,
   proof
@@ -115,7 +114,6 @@ export async function claim(
     );
 
     const transaction = await contract.populateTransaction.claimOwnership(
-      walletAddress,
       unpackedRoot,
       unpackedNullifier,
       unpackedProof,

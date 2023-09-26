@@ -15,7 +15,7 @@ You're the owner of a smart contract but you lost the key. You're screwed…. Or
 - [Live Demo](https://anti-social-recovery-club-2.vercel.app/)
   - We've implemented [Worldcoin](https://twitter.com/worldcoin)'s World ID verification in our app, which requires a World ID account. If you do not want to create one, you can use their simulator World ID here ([simulator World ID](https://simulator.worldcoin.org/))
 
-### Team
+#### Team
 
 - Alyssa Karchmer ([@AlyssaKarchmer](https://twitter.com/AlyssaKarchmer))
 - Crystal Tai ([@crystaltaixyz](https://twitter.com/crystaltaixyz))

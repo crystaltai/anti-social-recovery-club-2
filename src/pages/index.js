@@ -1,4 +1,5 @@
 import React from 'react';
+import Header from '@/components/Header/Header';
 import { ethers } from 'ethers';
 import { deploy, claim } from '../api-lib/contract-helper';
 import { ConnectWallet, useAddress } from '@thirdweb-dev/react';
@@ -98,166 +99,177 @@ export default function Home() {
   }
 
   return (
-    <main className={`${styles.main}`}>
-      <div className={styles.grid}>
-        <div className={styles.section}>
-          <h2>SIGN IN</h2>
-          <div className={styles.card}>
-            <p>User must connect wallet and verify on World ID.</p>
-            <div className={styles.connect}>
-              <ConnectWallet
-                theme='light'
-                switchToActiveChain={true}
-                className={styles.ConnectWallet}
-              />
-              {walletAddress ? (
-                <Check size={30} stroke='green' className={styles.checkmark} />
-              ) : (
-                ''
-              )}
-            </div>
-
-            <div className={styles.connect}>
-              <IDKitWidget
-                app_id={process.env.NEXT_PUBLIC_WLD_APP_ID} // obtained from the Developer Portal
-                signal={walletAddress}
-                action='verify-identity' // this is your action name from the Developer Portal
-                onSuccess={onSuccess} // callback when the modal is closed
-                handleVerify={handleVerify} // optional callback when the proof is received
-                credential_types={['orb', 'phone']} // optional, defaults to ['orb']
-                enableTelemetry // optional, defaults to false
-              >
-                {({ open }) => (
-                  <button className={styles.ButtonWC} onClick={open}>
-                    <Image
-                      src='/worldcoinlogo.png'
-                      alt='logo'
-                      width={25}
-                      height={25}
-                    />
-                    <span>Verify with World ID</span>
-                  </button>
-                )}
-              </IDKitWidget>
-              {verified ? (
-                <Check size={30} stroke='green' className={styles.checkmark} />
-              ) : (
-                ''
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className={styles.section}>
-          <h2>DEPLOY CONTRACT</h2>
-          <div className={styles.card}>
-            <p>Deploy a new contract as the owner</p>
-
-            <button
-              className={styles.Button}
-              onClick={deployContract}
-              disabled={walletAddress && verified ? false : true}
-            >
-              Deploy
-            </button>
-            {contractAddress ? (
-              <div className={styles.targetContract}>
-                <p>Contract Deployed: {contractAddress}</p>
-                <p>
-                  <a
-                    href={`https://mumbai.polygonscan.com/address/${contractAddress}`}
-                    target='_blank'
-                    className={styles.transactionLink}
-                  >
-                    View Contract
-                    <ExternalLink size={16} />
-                  </a>
-                </p>
-              </div>
-            ) : (
-              ''
-            )}
-          </div>
-        </div>
-
-        <h2 className={styles.or}>
-          <strong>OR</strong>
-        </h2>
-
-        <div className={styles.section}>
-          <h2>CLAIM OWNERSHIP</h2>
-          <div className={styles.card}>
-            <p>
-              Specify a contract to claim ownership. <br />
-              User must connect wallet and re-verify on World ID to claim
-              ownership.
-            </p>
-            <div className={styles.existingContract}>
-              <form
-                className={styles.form}
-                onSubmit={e => {
-                  e.preventDefault();
-                  setExistingContract(existingContractInput);
-                }}
-              >
-                <label htmlFor='existing-contract'>
-                  <p>Existing Contract:</p>
-                </label>
-                <input
-                  id='existing-contract'
-                  value={existingContractInput}
-                  placeholder='0x...'
-                  onChange={event => {
-                    setExistingContractInput(event.target.value);
-                  }}
-                  className={styles.input}
+    <>
+      <Header />
+      <main className={`${styles.main}`}>
+        <div className={styles.grid}>
+          <div className={styles.section}>
+            <h2>SIGN IN</h2>
+            <div className={styles.card}>
+              <p>User must connect wallet and verify on World ID.</p>
+              <div className={styles.connect}>
+                <ConnectWallet
+                  theme='light'
+                  switchToActiveChain={true}
+                  className={styles.ConnectWallet}
                 />
-                <button type='submit' className={styles.Button}>
-                  Import
-                </button>
-              </form>
-            </div>
+                {walletAddress ? (
+                  <Check
+                    size={30}
+                    stroke='green'
+                    className={styles.checkmark}
+                  />
+                ) : (
+                  ''
+                )}
+              </div>
 
-            <button
-              className={styles.Button}
-              onClick={claimContract}
-              disabled={
-                walletAddress && verified && existingContract ? false : true
-              }
-            >
-              Claim Ownership
-            </button>
-            {existingContract ? (
-              <div className={styles.targetContract}>
-                <p>Imported Contract: {existingContract}</p>
+              <div className={styles.connect}>
+                <IDKitWidget
+                  app_id={process.env.NEXT_PUBLIC_WLD_APP_ID} // obtained from the Developer Portal
+                  signal={walletAddress}
+                  action='verify-identity' // this is your action name from the Developer Portal
+                  onSuccess={onSuccess} // callback when the modal is closed
+                  handleVerify={handleVerify} // optional callback when the proof is received
+                  credential_types={['orb', 'phone']} // optional, defaults to ['orb']
+                  enableTelemetry // optional, defaults to false
+                >
+                  {({ open }) => (
+                    <button className={styles.ButtonWC} onClick={open}>
+                      <Image
+                        src='/worldcoinlogo.png'
+                        alt='logo'
+                        width={25}
+                        height={25}
+                      />
+                      <span>Verify with World ID</span>
+                    </button>
+                  )}
+                </IDKitWidget>
+                {verified ? (
+                  <Check
+                    size={30}
+                    stroke='green'
+                    className={styles.checkmark}
+                  />
+                ) : (
+                  ''
+                )}
               </div>
-            ) : (
-              ''
-            )}
-            {/* TODO: change conditional variable AND polygon link */}
-            {claimTrxnHash ? (
-              <div className={styles.targetContract}>
-                <p>
-                  You have successfully claimed ownership of the imported
-                  contract!
-                </p>
-                <p>
-                  <a
-                    href={`https://mumbai.polygonscan.com/tx/${claimTrxnHash}`}
-                    target='_blank'
-                    className={styles.transactionLink}
-                  >
-                    Want proof?
-                    <ExternalLink size={16} />
-                  </a>
-                </p>
+            </div>
+          </div>
+
+          <div className={styles.section}>
+            <h2>DEPLOY CONTRACT</h2>
+            <div className={styles.card}>
+              <p>Deploy a new contract as the owner</p>
+
+              <button
+                className={styles.Button}
+                onClick={deployContract}
+                disabled={walletAddress && verified ? false : true}
+              >
+                Deploy
+              </button>
+              {contractAddress ? (
+                <div className={styles.targetContract}>
+                  <p>Contract Deployed: {contractAddress}</p>
+                  <p>
+                    <a
+                      href={`https://mumbai.polygonscan.com/address/${contractAddress}`}
+                      target='_blank'
+                      className={styles.transactionLink}
+                    >
+                      View Contract
+                      <ExternalLink size={16} />
+                    </a>
+                  </p>
+                </div>
+              ) : (
+                ''
+              )}
+            </div>
+          </div>
+
+          <h2 className={styles.or}>
+            <strong>OR</strong>
+          </h2>
+
+          <div className={styles.section}>
+            <h2>CLAIM OWNERSHIP</h2>
+            <div className={styles.card}>
+              <p>
+                Specify a contract to claim ownership. <br />
+                User must connect wallet and re-verify on World ID to claim
+                ownership.
+              </p>
+              <div className={styles.existingContract}>
+                <form
+                  className={styles.form}
+                  onSubmit={e => {
+                    e.preventDefault();
+                    setExistingContract(existingContractInput);
+                  }}
+                >
+                  <label htmlFor='existing-contract'>
+                    <p>Existing Contract:</p>
+                  </label>
+                  <input
+                    id='existing-contract'
+                    value={existingContractInput}
+                    placeholder='0x...'
+                    onChange={event => {
+                      setExistingContractInput(event.target.value);
+                    }}
+                    className={styles.input}
+                  />
+                  <button type='submit' className={styles.Button}>
+                    Import
+                  </button>
+                </form>
               </div>
-            ) : (
-              ''
-            )}
+
+              <button
+                className={styles.Button}
+                onClick={claimContract}
+                disabled={
+                  walletAddress && verified && existingContract ? false : true
+                }
+              >
+                Claim Ownership
+              </button>
+              {existingContract ? (
+                <div className={styles.targetContract}>
+                  <p>Imported Contract: {existingContract}</p>
+                </div>
+              ) : (
+                ''
+              )}
+              {/* TODO: change conditional variable AND polygon link */}
+              {claimTrxnHash ? (
+                <div className={styles.targetContract}>
+                  <p>
+                    You have successfully claimed ownership of the imported
+                    contract!
+                  </p>
+                  <p>
+                    <a
+                      href={`https://mumbai.polygonscan.com/tx/${claimTrxnHash}`}
+                      target='_blank'
+                      className={styles.transactionLink}
+                    >
+                      Want proof?
+                      <ExternalLink size={16} />
+                    </a>
+                  </p>
+                </div>
+              ) : (
+                ''
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </>
   );
 }

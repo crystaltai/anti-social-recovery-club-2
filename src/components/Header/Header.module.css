@@ -1,0 +1,24 @@
+.HeaderWrapper {
+  padding: 2rem 5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 100wv;
+}
+
+.Logo {
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+.Github {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.GithubIcon {
+  background-color: var(--grey-600);
+  padding: 5px;
+  border-radius: 5px;
+}
